@@ -35,7 +35,7 @@ using namespace std;
 //DO ACTUAL ASSIGNMENT STUFF
 
 void startChatApp(string ipAddress,string portNum){
-    cout << "Starting Chat App...\n";
+    cout << "Connecting to server...\n";
     cout << "Listening on PORT " << portNum << "\n";
 }
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]){
     bool portInvalid=false;
     bool ipInvalid = false;
 
-    if(argc == 5){
+    if(argc == 5){ //client 
         string flag1 = argv[1];
         string followFlag1 = argv[2];
         string flag2 = argv[3];
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]){
             return -1;
         }
 
-    } else if(argc == 2){
+    } else if(argc == 2){ //print help message
         string flag = argv[1];
         if(flag == "-h"){
             helpMessage();
@@ -147,8 +147,8 @@ int main(int argc, char* argv[]){
         helpMessage(true);
         return -1;
         }
-    } else{
-
+    } else if(argc ==1){ //server
+        cout << "Waiting for connection to client...\n";
     }
     return 0;
 }
