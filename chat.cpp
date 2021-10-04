@@ -34,8 +34,9 @@ using namespace std;
 
 //DO ACTUAL ASSIGNMENT STUFF
 
-void startChatApp(){
+void startChatApp(string ipAddress,string portNum){
     cout << "Starting Chat App...\n";
+    cout << "Listening on PORT " << portNum << "\n";
 }
 
 //VALIDATION SECTION
@@ -53,7 +54,7 @@ void helpMessage(bool invalidInput=false){
 
 void invalidMessage(bool portInvalid, bool ipInvalid){
     string portMessage = "\nInvalid Port Number. Must only be digits.\n";
-    string ipMessage = "\nInvalid IP Address. Must be in IPv4 syntax. (XXX.XXX.XXX.XXX)\n";
+    string ipMessage = "\nInvalid IP Address. Must be in IPv4 syntax. (X.X.X.X)\n";
     if(portInvalid && ipInvalid){ //both invalid
         cout << portMessage;
         cout << ipMessage;
@@ -118,7 +119,7 @@ int main(int argc, char* argv[]){
                 invalidMessage(portInvalid,ipInvalid);
                 return -1;
             } else{
-                startChatApp();
+                startChatApp(ipAddress,portNum);
             }
         } else if(flag1=="-s" && flag2=="-p"){
             portNum = followFlag2;
@@ -129,7 +130,7 @@ int main(int argc, char* argv[]){
                 invalidMessage(portInvalid,ipInvalid);
                 return -1;
             } else{
-                startChatApp();
+                startChatApp(ipAddress,portNum);
             }
             
         } else {
@@ -147,7 +148,7 @@ int main(int argc, char* argv[]){
         return -1;
         }
     } else{
-        startChatApp();
+
     }
     return 0;
 }
