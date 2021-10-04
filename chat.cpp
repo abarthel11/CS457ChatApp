@@ -33,10 +33,17 @@
 using namespace std;
 
 //DO ACTUAL ASSIGNMENT STUFF
+void serverStart(){
+    cout << "Waiting for connection to client...\n";
+    while(true){
+    }
+}
 
-void startChatApp(string ipAddress,string portNum){
+void clientStart(string ipAddress,string portNum){
     cout << "Connecting to server...\n";
     cout << "Listening on PORT " << portNum << "\n";
+    while(true){
+    }
 }
 
 //VALIDATION SECTION
@@ -119,7 +126,7 @@ int main(int argc, char* argv[]){
                 invalidMessage(portInvalid,ipInvalid);
                 return -1;
             } else{
-                startChatApp(ipAddress,portNum);
+                clientStart(ipAddress,portNum);
             }
         } else if(flag1=="-s" && flag2=="-p"){
             portNum = followFlag2;
@@ -130,7 +137,7 @@ int main(int argc, char* argv[]){
                 invalidMessage(portInvalid,ipInvalid);
                 return -1;
             } else{
-                startChatApp(ipAddress,portNum);
+                clientStart(ipAddress,portNum);
             }
             
         } else {
@@ -148,7 +155,7 @@ int main(int argc, char* argv[]){
         return -1;
         }
     } else if(argc ==1){ //server
-        cout << "Waiting for connection to client...\n";
+        serverStart();
     }
     return 0;
 }
