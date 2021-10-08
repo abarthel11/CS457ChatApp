@@ -30,16 +30,76 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 using namespace std;
 
+#define BACKLOG 10
+
+void testaddrinfor(string address, string portnum)
+{
+    int status;
+    struct addrinfo hints, *res;
+    const char *c_address = address.c_str();
+    const char *c_portnum = portnum.c_str();
+    char ipstr[INET6_ADDRSTRLEN];
+    int sockfd;
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    struct addrinfo *p;
+    status = getaddrinfo(c_address, c_portnum, &hints, &res) ;
+    
+    for(p = res ; p!=NULL; p= p->ai_next){
+        sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
+        void *addr;
+        addr = &(ipv4->sin_addr);
+        inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+        cout << "yeheyh--->"<<ipstr << "\n";
+        if(sockfd == -1)
+            continue;
+        if(connect(sockfd, p->ai_addr, p->ai_addrlen) != -1){
+            cout<<"SUCSESSSS";
+            break;
+        }
+    }
+    if(p == NULL){
+        cout<< stderr << "couldnot connect \n";
+    }
+
+}
 //DO ACTUAL ASSIGNMENT STUFF
 void serverStart(){
     cout << "Waiting for connection to client...\n";
-    while(true){
-    }
+    struct sockaddr_storage their_addr;
+    socklen_t addr_size ;
+    struct addrinfo hints, *res;
+    int sockfd; 
+    //IPv4 of ferrari machine: 129.82.44.57
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    cout << "getaddrinfo val:   " <<getaddrinfo(NULL, "3790", &hints, &res) << "\n";
+
+    sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+    cout << "socket val:   " << sockfd ;
+    cout << "bind val:  " << bind(sockfd, res->ai_addr, res->ai_addrlen) << "\n" ;
+
+    cout << "listen val:    " << listen(sockfd, BACKLOG) << "\n";
+    addr_size = sizeof their_addr;
+    cout << "accept val:    " << accept(sockfd, (struct sockaddr *)&their_addr, &addr_size) <<"\n";
+
 }
 
 void clientStart(string ipAddress,string portNum){
+    testaddrinfor(ipAddress, portNum);
     cout << "Connecting to server...\n";
     cout << "Listening on PORT " << portNum << "\n";
     while(true){
@@ -158,4 +218,5 @@ int main(int argc, char* argv[]){
         serverStart();
     }
     return 0;
+
 }
