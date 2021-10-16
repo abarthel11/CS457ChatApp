@@ -56,6 +56,7 @@ string getHostIP() {
 
 void testaddrinfor(string address, string portnum)
 {
+    int status;
     struct addrinfo hints, *res;
     const char *c_address = address.c_str();
     const char *c_portnum = portnum.c_str();
@@ -69,10 +70,12 @@ void testaddrinfor(string address, string portnum)
     
     for(p = res ; p!=NULL; p= p->ai_next){
         sock_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+
         struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
         void *addr;
         addr = &(ipv4->sin_addr);
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
+
         // cout << "yeheyh--->"<<ipstr << "\n";
         if(sock_fd == -1)
             continue;
@@ -99,7 +102,6 @@ void testaddrinfor(string address, string portnum)
         cout << "Friend: "<<buffer << "\n";
 
     }
-    
 
 }
 //DO ACTUAL ASSIGNMENT STUFF
@@ -120,7 +122,6 @@ void serverStart(){
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
 
-    
     getaddrinfo(NULL, PORTNUM, &hints, &res);
     sock_fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     int bindVal = bind(sock_fd, res->ai_addr, res->ai_addrlen);
