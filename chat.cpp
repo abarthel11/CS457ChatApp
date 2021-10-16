@@ -56,7 +56,6 @@ string getHostIP() {
 
 void testaddrinfor(string address, string portnum)
 {
-    int status;
     struct addrinfo hints, *res;
     const char *c_address = address.c_str();
     const char *c_portnum = portnum.c_str();
