@@ -5,9 +5,9 @@
 * Member1 SIS ID: 833200684
 * Member1 Login ID: abarth11
 
-* Member2 Name: XXXXXX
-* Member2 SIS ID: XXXXXX
-* Member2 Login ID: XXXXXX
+* Member2 Name: Yosief Gebremedhin
+* Member2 SIS ID: 830031364
+* Member2 Login ID: ygebreme
 ********************************************/
 
 /*   
@@ -45,6 +45,7 @@ using namespace std;
 
 #define BACKLOG 10
 #define PORTNUM "3790"
+#define MAXSIZE 100
 
 
 string getHostIP() {
@@ -54,7 +55,7 @@ string getHostIP() {
 	return inet_ntoa(*addr_list[0]);
 }
 
-void testaddrinfor(string address, string portnum)
+void clientStart(string address, string portnum)
 {
     struct addrinfo hints, *res;
     const char *c_address = address.c_str();
@@ -75,11 +76,9 @@ void testaddrinfor(string address, string portnum)
         addr = &(ipv4->sin_addr);
         inet_ntop(p->ai_family, addr, ipstr, sizeof ipstr);
 
-        // cout << "yeheyh--->"<<ipstr << "\n";
         if(sock_fd == -1)
             continue;
         if(connect(sock_fd, p->ai_addr, p->ai_addrlen) != -1){
-            // cout<<"SUCSESSSS";
             break;
         }
     }
@@ -87,20 +86,41 @@ void testaddrinfor(string address, string portnum)
         cout<< stderr << "couldnot connect \n";
     }
     cout << "Connecting to server...\n";
-    // cout << "Listening on PORT " << portnum << "\n";
     cout << "Connected to a friend! You send first.\n";
-    
-    while (true)
+        int recResult;
+    recResult = -1;
+    do
     {
-        char message[100];
+        
         char buffer[1024] = {0};
-        cout << "You: ";
-        scanf("%s", message);
-        send(sock_fd, message, strlen(message), 0);
-        read(sock_fd, buffer, 1024);
-        cout << "Friend: "<<buffer << "\n";
+        string message;
+        bool validMessage = false;
+        while(validMessage == false){
+            cout << "You: ";
+            getline(cin, message);
+            if(message.length() <= (size_t)140){
+                validMessage = true; 
+            }
+            else{
+                cerr <<"Error: Input too long.\n";
+            }
 
-    }
+        }
+        
+        const char *c_message = message.c_str();
+        send(sock_fd, c_message, MAXSIZE-1, 0);
+        
+        recResult = recv(sock_fd, buffer, MAXSIZE-1,0);
+        
+        if(recResult > 0)
+            cout << "Friend: "<<buffer << "\n";
+        else if (recResult == 0)
+            cout << "Connection closed\n";
+        else
+            cout << "recv falied\n" ;
+    } while(recResult > 0);
+    close(sock_fd);
+    
 
 }
 //DO ACTUAL ASSIGNMENT STUFF
@@ -137,28 +157,54 @@ void serverStart(){
     addr_size = sizeof their_addr;
     int client_fd =accept(sock_fd, (struct sockaddr *)&their_addr, &addr_size);
 
+    if(client_fd == -1){
+        cerr << "Failed to accept\n";
+        runChat = false;
+    }
+
     if(runChat)
         cout << "Found a friend! You receive first.\n";
-    
-    while (runChat)
-    {
+    int recResult;
+    recResult = -1;
+    do
+    {   
         char buffer[1024] = {0};
-        char message[100];
-        read(client_fd, buffer, 1024);
-        cout << "Friend: "<<buffer << "\n";
-        cout << "You: ";
-        scanf("%s", message);
-        send(client_fd, message, strlen(message), 0);
+        string message;
+        recResult = recv(client_fd, buffer, MAXSIZE-1,0);
+        if(recResult > 0)
+            cout << "Friend: "<<buffer << "\n";
+        
+        else if (recResult == 0){
+            cout << "Connection closed\n";
+            break;
+            }
+        else{
+            cerr << "recv falied\n" ;
+            break;
+        }
 
-    }
-    close(client_fd);
-    
+        bool validMessage = false;
+
+        while(validMessage == false){
+            cout << "You: ";
+            getline(cin, message);
+            if(message.length() <= (size_t)140){
+                validMessage = true; 
+            }
+            else{
+                cout <<"Error: Input too long.\n";
+            }
+
+        }
+        const char *c_message = message.c_str();  
+         send(client_fd, c_message, MAXSIZE-1, 0);
+
+    } while(recResult > 0);
+
+    close(client_fd);   
 
 }
 
-void clientStart(string ipAddress,string portNum){
-    testaddrinfor(ipAddress, portNum);
-}
 
 //VALIDATION SECTION
 void helpMessage(bool invalidInput=false){
